@@ -1,0 +1,32 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel
+spec:
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+
+    exporters:
+      logging:
+        verbosity: detailed
+        sampling_initial: 5
+        sampling_thereafter: 200
+      otlp:
+        endpoint: "http://192.168.100.42:55678"
+        tls:
+          insecure: true
+
+    service:
+      pipelines:
+        metrics:
+          receivers: [ otlp ]
+          processors: [ ]
+          exporters: [ logging ]
+        traces:
+          receivers: [ otlp ]
+          processors: [ ]
+          exporters: [ logging ]

@@ -1,0 +1,146 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: my-instrumentation
+spec:
+  exporter:
+    # hostname of collector service = {collector name}-collector
+    endpoint: http://otel-collector:4317
+  java:
+    image: inspectit/inspectit-ocelot-agent:latest
+    env:
+      - name: INSPECTIT_CONFIG_HTTP_URL
+        value: "http://inspectit-ocelot-config-server:80/config.yaml"
+      - name: K8S_NODE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: spec.nodeName
+      - name: K8S_POD_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.name
+      - name: K8S_NAMESPACE
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.namespace
+      - name: K8S_DEPLOYMENT_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.labels['app']
+
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inspectit-ocelot-config
+  namespace: default
+data:
+  config.yaml: |
+    inspectit:
+      tags:
+        extra:
+          landscape_token: ${LANDSCAPE_TOKEN_ID}
+          token_secret: ${LANDSCAPE_TOKEN_SECRET}
+          application_name: "petclinic"
+          application_instance_id: 0
+          application_language: "java"
+          k8s.node.name: ${K8S_NODE_NAME}
+          k8s.pod.name: ${K8S_POD_NAME}
+          k8s.namespace.name: ${K8S_NAMESPACE}
+          k8s.deployment.name: ${K8S_DEPLOYMENT_NAME}
+
+
+      tracing:
+        add-common-tags: ALWAYS
+
+      metrics:
+        enabled: false
+
+      instrumentation:
+        scopes:
+          s_allClasses:
+            type:
+              name: org.springframework.samples
+              matcher-mode: STARTS_WITH_IGNORE_CASE
+
+        rules:
+          r_all_methods_no_input_return:
+            scopes:
+              s_allClasses: true
+            tracing:
+              start-span: true
+              attributes:
+                java.fqn: method_fqn_attr
+            entry:
+              method_fqn_attr:
+                action: a_get_method_fqn
+
+        actions:
+          a_get_method_fqn:
+            input:
+              _methodName: String
+              _class: Class
+            value: "new StringBuilder(_class.getName()).append('.').append(_methodName).toString()"
+
+      logging:
+        debug: true
+        trace: false
+      exporters:
+        tracing:
+          service-name: "Ocelot Otel Exporter"
+          otlp:
+            enabled: true
+            endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+            protocol: grpc
+
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inspectit-ocelot-config-server
+  labels:
+    app: inspectit-ocelot-config-server
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inspectit-ocelot-config-server
+  template:
+    metadata:
+      name: inspectit-ocelot-config-server
+      labels:
+        app: inspectit-ocelot-config-server
+    spec:
+      containers:
+        - name: inspectit-ocelot-config-server
+          image: nginx
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: inspectit-ocelot-config
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: inspectit-ocelot-config
+          configMap:
+            name: inspectit-ocelot-config
+      restartPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: inspectit-ocelot-config-server
+spec:
+  selector:
+    app: inspectit-ocelot-config-server
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
