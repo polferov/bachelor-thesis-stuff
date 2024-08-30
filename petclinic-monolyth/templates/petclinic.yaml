@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic-monolyth
+  labels:
+    app: petclinic-monolyth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: petclinic-monolyth
+  template:
+    metadata:
+      name: petclinic-monolyth
+      labels:
+        app: petclinic-monolyth
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: "true"
+    spec:
+      containers:
+        - name: petclinic-monolyth
+          image: explorviz/spring-petclinic
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic-monolyth
+spec:
+  selector:
+    app: petclinic-monolyth
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: NodePort
+  
