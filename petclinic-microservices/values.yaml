@@ -1,0 +1,24 @@
+services:
+  - name: config-server
+    image: explorviz/spring-petclinic-config-server
+    port: 8888
+  - name: discovery-server
+    image: explorviz/spring-petclinic-discovery-server
+    port: 8761
+  - name: customers-service
+    image: explorviz/spring-petclinic-customers-service
+    port: 8081
+  - name: visits-service
+    image: explorviz/spring-petclinic-visits-service
+    port: 8082
+  - name: vets-service
+    image: explorviz/spring-petclinic-vets-service
+    port: 8083
+  - name: api-gateway
+    image: explorviz/spring-petclinic-api-gateway
+    port: 8080
+    alt_liveliness: /api/vet/vets
+  - name: admin-server
+    image: explorviz/spring-petclinic-admin-server
+    port: 9090
+    

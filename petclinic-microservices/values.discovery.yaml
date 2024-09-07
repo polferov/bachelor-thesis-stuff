@@ -1,0 +1,4 @@
+services:
+  - name: discovery-server
+    image: explorviz/spring-petclinic-discovery-server
+    port: 8761

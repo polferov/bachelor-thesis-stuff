@@ -1,0 +1,5 @@
+services:
+  - name: config-server
+    image: explorviz/spring-petclinic-config-server
+    port: 8888
+    
