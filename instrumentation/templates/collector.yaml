@@ -16,7 +16,7 @@ spec:
         sampling_initial: 5
         sampling_thereafter: 200
       otlp:
-        endpoint: "http://192.168.100.42:55678"
+        endpoint: "http://192.168.178.33:55678"
         tls:
           insecure: true
 
@@ -25,8 +25,8 @@ spec:
         metrics:
           receivers: [ otlp ]
           processors: [ ]
-          exporters: [ logging ]
+          exporters: [ logging, otlp ]
         traces:
           receivers: [ otlp ]
           processors: [ ]
-          exporters: [ logging ]
+          exporters: [ logging, otlp ]

@@ -35,15 +35,14 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: inspectit-ocelot-config
-  namespace: default
 data:
   config.yaml: |
     inspectit:
       tags:
         extra:
-          landscape_token: ${LANDSCAPE_TOKEN_ID}
-          token_secret: ${LANDSCAPE_TOKEN_SECRET}
-          application_name: "petclinic"
+          landscape_token: mytokenvalue
+          token_secret: mytokensecret
+          application_name: ${K8S_DEPLOYMENT_NAME}
           application_instance_id: 0
           application_language: "java"
           k8s.node.name: ${K8S_NODE_NAME}
