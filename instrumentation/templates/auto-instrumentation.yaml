@@ -5,7 +5,7 @@ metadata:
 spec:
   exporter:
     # hostname of collector service = {collector name}-collector
-    endpoint: http://otel-collector:4317
+    endpoint: http://otel-collector.{{.Release.Namespace}}.svc.cluster.local:4317
   java:
     image: inspectit/inspectit-ocelot-agent:latest
     env:
