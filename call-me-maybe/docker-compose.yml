@@ -1,0 +1,59 @@
+services:
+  ocelot-agent:
+    image: inspectit/inspectit-ocelot-agent:2.6.5
+    container_name: ocelot-agent-petclinic
+    volumes:
+      - agent-vol:/agent
+
+  call-me-maybe-1:
+    image: ${IMAGE}
+    depends_on:
+      - ocelot-agent
+    ports:
+      - 9999:8080
+    environment:
+      - LANDSCAPE_TOKEN_ID=${LANDSCAPE_TOKEN_ID}
+      - LANDSCAPE_TOKEN_SECRET=${LANDSCAPE_TOKEN_SECRET}
+      - APPLICATION_NAME=call-me-maybe-1
+      - EXTERNAL_SERVICE_URL=http://call-me-maybe-2:8080
+      - JAVA_TOOL_OPTIONS=-javaagent:/agent/inspectit-ocelot-agent.jar
+      - INSPECTIT_EXPORTERS_TRACING_ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+    volumes:
+      - agent-vol:/agent
+      - ./inspectit.yml:/agent/inspectit.yml
+
+  call-me-maybe-2:
+    image: ${IMAGE}
+    depends_on:
+      - ocelot-agent
+    environment:
+      - LANDSCAPE_TOKEN_ID=${LANDSCAPE_TOKEN_ID}
+      - LANDSCAPE_TOKEN_SECRET=${LANDSCAPE_TOKEN_SECRET}
+      - APPLICATION_NAME=call-me-maybe-2
+      - EXTERNAL_SERVICE_URL=http://call-me-maybe-1:8080
+      - JAVA_TOOL_OPTIONS=-javaagent:/agent/inspectit-ocelot-agent.jar
+      - INSPECTIT_EXPORTERS_TRACING_ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+    volumes:
+      - agent-vol:/agent
+      - ./inspectit.yml:/agent/inspectit.yml
+
+  # The zipkin process services the UI, and also exposes a POST endpoint that
+  # instrumentation can send trace data to.
+  zipkin:
+    image: ghcr.io/openzipkin/zipkin-slim:${TAG:-latest}
+    container_name: zipkin
+    # Environment settings are defined here https://github.com/openzipkin/zipkin/blob/master/zipkin-server/README.md#environment-variables
+    environment:
+      - STORAGE_TYPE=mem
+      # Uncomment to enable self-tracing
+      # - SELF_TRACING_ENABLED=true
+      # Uncomment to increase heap size
+      # - JAVA_OPTS=-Xms128m -Xmx128m -XX:+ExitOnOutOfMemoryError
+    ports:
+      # Port used for the Zipkin UI and HTTP Api
+      - 9411:9411
+    # Uncomment to enable debug logging
+    # command: --logging.level.zipkin2=DEBUG
+
+volumes:
+  agent-vol:
