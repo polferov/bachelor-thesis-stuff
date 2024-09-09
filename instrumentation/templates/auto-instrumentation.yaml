@@ -10,7 +10,7 @@ spec:
     image: inspectit/inspectit-ocelot-agent:latest
     env:
       - name: INSPECTIT_CONFIG_HTTP_URL
-        value: "http://inspectit-ocelot-config-server:80/config.yaml"
+        value: http://inspectit-ocelot-config-server.{{.Release.Namespace}}.svc.cluster.local:80/config.yaml
       - name: K8S_NODE_NAME
         valueFrom:
           fieldRef:
@@ -53,6 +53,8 @@ data:
 
       tracing:
         add-common-tags: ALWAYS
+        propagation-format: B3
+        enabled: true
 
       metrics:
         enabled: false
@@ -61,7 +63,7 @@ data:
         scopes:
           s_allClasses:
             type:
-              name: org.springframework.samples
+              name: "org"
               matcher-mode: STARTS_WITH_IGNORE_CASE
 
         rules:
