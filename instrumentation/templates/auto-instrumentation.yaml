@@ -63,7 +63,7 @@ data:
         scopes:
           s_allClasses:
             type:
-              name: "org"
+              name: ${INSPECTIT_PACKAGE_NAME}
               matcher-mode: STARTS_WITH_IGNORE_CASE
 
         rules:

@@ -27,6 +27,8 @@ spec:
           env:
             - name: EXTERNAL_SERVICE_URL
               value: {{.other_url}}
+            - name: INSPECTIT_PACKAGE_NAME
+              value: "org.example.callmemaybe"
       restartPolicy: Always
 
 ---

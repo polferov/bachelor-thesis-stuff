@@ -1,4 +1,5 @@
 opentelemetry-collector-daemonset:
+  enabled: false
   mode: daemonset
   presets:
     kubeletMetrics:
@@ -32,6 +33,7 @@ opentelemetry-collector-daemonset:
           exporters: [ logging, otlp ]
 
 opentelemetry-collector-deployment:
+  enabled: false
   mode: deployment
   presets:
     hostMetrics:
