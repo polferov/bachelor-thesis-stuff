@@ -17,7 +17,7 @@ inspectit:
     scopes:
       s_allClasses:
         type:
-          name: ""
+          name: "org.example.callmemaybe"
           matcher-mode: STARTS_WITH_IGNORE_CASE
 
     rules:
@@ -45,11 +45,7 @@ inspectit:
 
   exporters:
     tracing:
-      service-name: "Ocelot Otel Exporter"
-      otlp:
-        enabled: true
-        endpoint: http://192.168.100.42:55678
-        protocol: grpc
+      service-name: ${APPLICATION_NAME}
       zipkin:
         enabled: true
-        url: http://zipkin:9411/api/v2/spans
+        endpoint: http://zipkin:9411/api/v2/spans

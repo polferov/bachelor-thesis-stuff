@@ -16,7 +16,7 @@ spec:
         sampling_initial: 5
         sampling_thereafter: 200
       otlp:
-        endpoint: "http://192.168.178.33:55678"
+        endpoint: "http://192.168.178.52:55678"
         tls:
           insecure: true
 

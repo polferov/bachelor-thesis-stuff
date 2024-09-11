@@ -1,6 +1,6 @@
 services:
   ocelot-agent:
-    image: inspectit/inspectit-ocelot-agent:2.6.5
+    image: inspectit/inspectit-ocelot-agent:2.1.1
     container_name: ocelot-agent-petclinic
     volumes:
       - agent-vol:/agent
@@ -16,8 +16,8 @@ services:
       - LANDSCAPE_TOKEN_SECRET=${LANDSCAPE_TOKEN_SECRET}
       - APPLICATION_NAME=call-me-maybe-1
       - EXTERNAL_SERVICE_URL=http://call-me-maybe-2:8080
-      - JAVA_TOOL_OPTIONS=-javaagent:/agent/inspectit-ocelot-agent.jar
-      - INSPECTIT_EXPORTERS_TRACING_ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+      - JAVA_TOOL_OPTIONS=-javaagent:/agent/inspectit-ocelot-agent.jar -Dinspectit.config.file-based.path="/agent/"
+      - INSPECTIT_EXPORTERS_TRACING_ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
     volumes:
       - agent-vol:/agent
       - ./inspectit.yml:/agent/inspectit.yml
@@ -31,8 +31,8 @@ services:
       - LANDSCAPE_TOKEN_SECRET=${LANDSCAPE_TOKEN_SECRET}
       - APPLICATION_NAME=call-me-maybe-2
       - EXTERNAL_SERVICE_URL=http://call-me-maybe-1:8080
-      - JAVA_TOOL_OPTIONS=-javaagent:/agent/inspectit-ocelot-agent.jar
-      - INSPECTIT_EXPORTERS_TRACING_ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+      - JAVA_TOOL_OPTIONS=-javaagent:/agent/inspectit-ocelot-agent.jar -Dinspectit.config.file-based.path="/agent/"
+      - INSPECTIT_EXPORTERS_TRACING_ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
     volumes:
       - agent-vol:/agent
       - ./inspectit.yml:/agent/inspectit.yml
