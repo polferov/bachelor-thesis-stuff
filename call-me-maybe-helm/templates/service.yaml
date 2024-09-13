@@ -7,7 +7,7 @@ metadata:
   labels:
     app: {{.name}}
 spec:
-  replicas: 1
+  replicas: {{.replica_count}}
   selector:
     matchLabels:
       app: {{.name}}
@@ -44,7 +44,7 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
-  type: NodePort
+  type: LoadBalancer
 
 ---
 {{- end}}

@@ -27,6 +27,8 @@ spec:
         valueFrom:
           fieldRef:
             fieldPath: metadata.labels['app']
+      - name: INSPECTIT_PACKAGE_NAME
+        value: org
 
 
 ---

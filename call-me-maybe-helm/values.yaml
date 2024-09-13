@@ -3,5 +3,7 @@ image: polferov/call-me-maybe
 services:
   - name: call-me-maybe-1
     other_url: http://call-me-maybe-2:8080
+    replica_count: 2
   - name: call-me-maybe-2
     other_url: http://call-me-maybe-1:8080
+    replica_count: 3
